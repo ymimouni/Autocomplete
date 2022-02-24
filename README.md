@@ -48,10 +48,10 @@ make test
 would allow to handle this if you decide to use specific tools (frameworks, databases…)?
 
 #### Functional Requirements
-Given a list of keywords, offer up to 4 suggested keywords from the list, starting with the letters typed,
+- Given a list of keywords, offer up to 4 suggested keywords from the list, starting with the letters typed,
 case-insensitive.
 
-The results must be in alphabetical order.
+- The results must be in alphabetical order.
 
 #### Non-functional Requirements
 - Low latency in order to create a real-time experience.
@@ -65,12 +65,14 @@ The results must be in alphabetical order.
 #### Requests flow
 ![Requests flow](./images/requestsFlow.jpg)
 
-We split the list of keywords among different trie nodes' sets, and these nodes have replicas as well.
+To improve latency and availability, we split the list of keywords among different trie nodes' sets, and these nodes
+have replicas as well.
 
 When the user enters something in the search bar, the request goes through the gateway to the load balancer, which
 forwards it to an available application server. Given a prefix, the application server tries to fetch suggestions from
 the distributed cache. In case of failure, it communicates with the Zookeeper to locate the trie node to access for the
 prefix in hand. The application server returns the results to the load balancer before updating the cache as well.
+
 #### Updates flow
 ![Updates flow](./images/updatesFlow.jpg)
 
@@ -82,6 +84,13 @@ our database. This process has to be done periodically (every hour for example) 
 The builder server loads periodically the list of keywords from the database and builds a new trie (we can have more
 than one builder working in parallel on different ranges of the alphabet: a -> h and i ->p...). Once the trie is ready,
 it is made available for use through the Zookeeper, any new requests are directed to the new trie.
+
+For better durability, we store the serialized version of our tries in our database, in case of failure, these stored
+tries can be recovered and made available again.
+
+#### Implementation
+We can use Redis for our distributed cache, Cassandra for our distributed database and Kafka as a message broker.
+
 #### Metrics
 We can collect different metrics from the user and the system to assess whether we are successful or not with our
 design:
