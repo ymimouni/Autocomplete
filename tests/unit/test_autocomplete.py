@@ -24,17 +24,3 @@ def test_autocomplete(populated_ac):
 
     for prefix, expected in data:
         assert populated_ac.get_suggestions(prefix) == expected
-
-
-def test_precomputation(populated_ac):  # noqa
-    data = [('', []),
-            ('p', ['pandora', 'paypal', 'pg&e', 'pinterest']),
-            ('pr', ['press democrat', 'priceline', 'proactive', 'progenex']),
-            ('pro', ['proactive', 'progenex', 'progeria', 'progesterone']),
-            ('prog', ['progenex', 'progeria', 'progesterone']),
-            ('progenex', ['progenex'])]
-
-    populated_ac.precompute_suggestions()
-
-    for prefix, expected in data:
-        assert populated_ac.get_suggestions(prefix) == expected
