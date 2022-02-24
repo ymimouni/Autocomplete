@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Generator
 
 
 class TrieNode:
@@ -7,6 +7,15 @@ class TrieNode:
         self.children = {}
         self.is_end = False
         self.suggestions = []
+
+
+def children_suggestions(node: TrieNode) -> Generator[str, None, None]:
+    """
+    A helper function that traverses the children of a node in alphabetic order, and returns their suggestions.
+    """
+    for c in sorted(node.children.keys()):
+        for s in node.children[c].suggestions:
+            yield s
 
 
 class Autocomplete:
@@ -68,3 +77,28 @@ class Autocomplete:
             dfs(node, list(prefix))
             node.suggestions = suggestions
         return node.suggestions
+
+    def precompute_suggestions(self) -> None:
+        """
+        Precompute up to NUMBER_OF_SUGGESTIONS suggestions from the trie, starting with every possible prefix in the
+         trie. Save the results in the suggestions list of the corresponding node.
+        """
+
+        def traverse(node: TrieNode, characters: List[str]) -> None:  # noqa
+            """
+            A helper function that uses post-order traversal of the trie to compute suggestions.
+            """
+            # Traverse the children of the current node.
+            for c in sorted(node.children.keys()):
+                traverse(node.children[c], characters + [c])
+            # If the current node is the end of a word, add it to suggestions.
+            if node.is_end:
+                node.suggestions.append(''.join(characters))
+            # Compose the list of suggestions of the current word based on those of its children.
+            for suggestion in children_suggestions(node):
+                node.suggestions.append(suggestion)
+                if len(node.suggestions) == self.NUMBER_OF_SUGGESTIONS:
+                    break
+
+        node = self.trie
+        traverse(node, [])
