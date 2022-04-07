@@ -1,3 +1,21 @@
+## Assignment
+You are given a list of keywords. Write a program that will offer up to 4 suggested keywords from the list, starting
+with the letters typed, not case-sensitive. Similar to Google Autocomplete, except that results must be in alphabetical
+order.
+
+### Examples
+
+keywords = ['project runway', 'pinterest', 'river', 'kayak', 'progenex', 'progeria', 'pg&e', 'project free tv', 'bank',
+'proactive', 'progesterone', 'press democrat', 'priceline', 'pandora', 'reprobe', 'paypal']
+
+Autocomplete('p') = ['pandora', 'paypal', 'pg&e', 'pinterest']
+
+Autocomplete('pr') = ['press democrat', 'priceline', 'proactive', 'progenex']
+
+Autocomplete('pro') = ['proactive', 'progenex', 'progeria', 'progesterone']
+
+Autocomplete('p') = ['progenex', 'progeria', 'progesterone']
+
 ## Approach
 Given a prefix, we need to offer up to 4 suggestions from the list of keywords. A trie is a good fit for this problem.
 A pre-order traversal of the trie can help us return the results in alphabetical order.
